@@ -62,8 +62,10 @@
             this.dataGridView1.RowTemplate.DefaultCellStyle.SelectionBackColor = System.Drawing.Color.White;
             this.dataGridView1.RowTemplate.Height = 60;
             this.dataGridView1.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
+            this.dataGridView1.ShowCellToolTips = false;
             this.dataGridView1.Size = new System.Drawing.Size(1710, 952);
             this.dataGridView1.TabIndex = 0;
+            this.dataGridView1.ColumnWidthChanged += new System.Windows.Forms.DataGridViewColumnEventHandler(this.dataGridView1_ColumnWidthChanged);
             this.dataGridView1.RowsAdded += new System.Windows.Forms.DataGridViewRowsAddedEventHandler(this.dataGridView1_RowsAdded);
             this.dataGridView1.RowsRemoved += new System.Windows.Forms.DataGridViewRowsRemovedEventHandler(this.dataGridView1_RowsRemoved);
             this.dataGridView1.Scroll += new System.Windows.Forms.ScrollEventHandler(this.dataGridView1_Scroll);
@@ -71,43 +73,43 @@
             // 
             // Column1
             // 
-            this.Column1.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
             this.Column1.HeaderText = "姓名";
             this.Column1.MinimumWidth = 10;
             this.Column1.Name = "Column1";
             this.Column1.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.Column1.Width = 301;
             // 
             // Column2
             // 
-            this.Column2.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
             this.Column2.HeaderText = "性别";
             this.Column2.MinimumWidth = 10;
             this.Column2.Name = "Column2";
             this.Column2.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.Column2.Width = 301;
             // 
             // Column3
             // 
-            this.Column3.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
             this.Column3.HeaderText = "年龄";
             this.Column3.MinimumWidth = 10;
             this.Column3.Name = "Column3";
             this.Column3.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.Column3.Width = 302;
             // 
             // Column5
             // 
-            this.Column5.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
             this.Column5.HeaderText = "身份证号";
             this.Column5.MinimumWidth = 10;
             this.Column5.Name = "Column5";
             this.Column5.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.Column5.Width = 301;
             // 
             // Column4
             // 
-            this.Column4.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
             this.Column4.HeaderText = "家庭住址";
             this.Column4.MinimumWidth = 10;
             this.Column4.Name = "Column4";
             this.Column4.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.Column4.Width = 500;
             // 
             // Column7
             // 

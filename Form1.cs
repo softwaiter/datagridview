@@ -24,9 +24,6 @@ namespace DataGridOperationButtons
 
         private void AddButtons()
         {
-            int rowIndex = dataGridView1.Rows.Count - 1;
-            Rectangle rect = this.dataGridView1.GetCellDisplayRectangle(btnColIndex, rowIndex, false);
-
             Button btnAdd = new Button();
             btnAdd.Text = "+";
             btnAdd.Click += onAddButtonClick;
@@ -80,27 +77,30 @@ namespace DataGridOperationButtons
         {
             Task.Run(() =>
             {
-                Thread.Sleep(100);
+                    Thread.Sleep(100);
 
-                int firstRow = dataGridView1.FirstDisplayedScrollingRowIndex;
-                int lastRow = firstRow + dataGridView1.DisplayedRowCount(false);
+                    int firstRow = dataGridView1.FirstDisplayedScrollingRowIndex;
+                    int lastRow = firstRow + dataGridView1.DisplayedRowCount(false);
+                    int firstCol = dataGridView1.FirstDisplayedScrollingColumnIndex;
+                    int lastCol = firstCol + dataGridView1.DisplayedColumnCount(true);
 
-                for (int i = 0; i < mButtons.Count; i++)
-                {
-                    ActionButtons ab = mButtons[i];
-                    ab.AddButton.Tag = i;
-                    ab.RemoveButton.Tag = i;
-
-                    if (i >= firstRow && i <= lastRow)
+                    for (int i = 0; i < mButtons.Count; i++)
                     {
-                        Rectangle rect = this.dataGridView1.GetCellDisplayRectangle(btnColIndex, i, false);
-                        UpdateActionButtonsPosition(ab, rect, i);
+                        ActionButtons ab = mButtons[i];
+                        ab.AddButton.Tag = i;
+                        ab.RemoveButton.Tag = i;
+
+                        if (i >= firstRow && i <= lastRow &&
+                            btnColIndex >= firstCol && btnColIndex <= lastCol)
+                        {
+                            Rectangle rect = this.dataGridView1.GetCellDisplayRectangle(btnColIndex, i, false);
+                            UpdateActionButtonsPosition(ab, rect, i);
+                        }
+                        else
+                        {
+                            HideAllActionButtons(ab);
+                        }
                     }
-                    else
-                    {
-                        HideAllActionButtons(ab);
-                    }
-                }
             });
         }
 
@@ -156,6 +156,12 @@ namespace DataGridOperationButtons
         private void dataGridView1_SizeChanged(object sender, EventArgs e)
         {
             RepositionActionButtons();
+        }
+
+        private void dataGridView1_ColumnWidthChanged(object sender, DataGridViewColumnEventArgs e)
+        {
+            RepositionActionButtons();
+            this.Refresh();
         }
     }
 }
