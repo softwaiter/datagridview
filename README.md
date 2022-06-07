@@ -1,16 +1,16 @@
-# ʵ��DataGridView�ఴť������
+# 实现DataGridView多按钮操作列
 
-?		�ںܶ�WinForm�����У�����������ʹ��DataGridView���б༭�ĳ������û�ϣ��������һ�������У��������������ť��һ�������еİ�ť��һ��ɾ���еİ�ť�����ҵ�һ��ֻ�������еİ�ť��û��ɾ���еİ�ť����ŵĽ������£�
+在很多WinForm过程中，经常会遇到使用DataGridView进行编辑的场景，用户希望在最后放一个操作列，里面放置两个按钮，一个增加行的按钮，一个删除行的按钮；并且第一行只有增加行的按钮，没有删除行的按钮，大概的界面如下：
 
 ![]( http://res.dayuan.tech/images/datagridview01.png )
 
-?		DataGridView�����ṩ��DataGridViewButtonColumn�����ͣ���������ֻ�����һ��Button�ڵ�Ԫ��������������ǵ�����ͨ�������������кܶ�ʵ�ַ���������ѡ����ͨ����̬���ɰ�ť�ķ��������������ڵ�Ԫ�����ʾ��Χ��̬���ô�С��λ�á�
+DataGridView本身提供了DataGridViewButtonColumn列类型，但问题是只会放置一个Button在单元格里，不能满足我们的需求；通过网络搜索，有很多实现方案，最终选用了通过动态生成按钮的方案，并根据所在单元格的显示范围动态设置大小和位置。
 
-?		�÷�����ʵ�ֹ�����һЩϸ����Ҫע�⣬�����Ӱ���û���ʹ�����飬�ȼ�¼���£�ϣ��Ϊ��������Ҫ�������ṩһЩ��������Ҫ�����ѿɵ�����ĩβ��ȡ����Դ�룬ֱ�Ӹ��Ƶ��Լ�����Ŀ���á�
+该方案在实现过程有一些细节需要注意，否则会影响用户的使用体验，先记录如下，希望为后面有需要的朋友提供一些帮助，需要的朋友可到文章末尾获取完整源码，直接复制到自己的项目可用。
 
-#### һ�����DataGridView��RowsAdded��RowsRemoved�¼����а�ť�Ķ�̬���ɺ��Ƴ�
+#### 一、监控DataGridView的RowsAdded、RowsRemoved事件进行按钮的动态生成和移除
 
-?		�����Ƕ�̬���ɰ�ť��ʱ����һ��Ҫ��DataGridView��RowsAdded��RowsRemoved�¼���ȥ�����������Ҫ�������û������еĴ��봦�����Ӷ�̬���ɰ�ť�Ĵ��룬���ں��ڵĴ���ά���ܲ��Ѻã�������RowsAdded�¼���RowsRemoved�¼��п���һ�����ݵĽ��������⣬�������£�
+首先是动态生成按钮的时机，一定要在DataGridView的RowsAdded和RowsRemoved事件中去做，否则就需要再所有用户增加行的代码处都增加动态生成按钮的代码，对于后期的代码维护很不友好；而放在RowsAdded事件和RowsRemoved事件中可以一劳永逸的解决这个问题，代码如下：
 
 ```c#
 private void dataGridView1_RowsAdded(object sender, DataGridViewRowsAddedEventArgs e)
@@ -46,9 +46,9 @@ private void dataGridView1_RowsRemoved(object sender, DataGridViewRowsRemovedEve
 
 
 
-#### ����ʹ���б�����˳�򱣴涯̬���ɵİ�ť������֧�ְ�ť�Ƴ��Ͱ�ťλ�ø���
+#### 二、使用列表按行顺序保存动态生成的按钮，用以支持按钮移除和按钮位置跟新
 
-?		�����û�����DataGridView���в����ǲ���������������ɾ������һ�У�Ҳ����������һ�к�����룬����������Ҫ��¼ÿ����ť��Ӧ�����������Ա��ں��ڸ���ʱʹ�ã�Ϊ�˽����ӡ�ɾ����ť����Ĵ洢���Ͷ�Ӧ���н���ӳ�䣬���Ƕ�����һ��ActionButtons�࣬��ÿһ�ж�Ӧ�İ�ť����¼��ActionButtonsʵ���У�����˳�����List���У�ActionButtonsʵ����List�б��еĵ������ż��Ƕ�Ӧ��DataGridView�кţ��������£�
+由于用户对于DataGridView的行操作是不可以允许，可能删除任意一行，也可能在任意一行后面插入，所以我们需要记录每个按钮对应的行索引，以便于后期更新时使用；为了将增加、删除按钮方便的存储并和对应的行进行映射，我们定义了一个ActionButtons类，将每一行对应的按钮都记录在ActionButtons实例中，并按顺序存入List表中，ActionButtons实例在List列表中的的索引号即是对应的DataGridView行号，代码如下：
 
 ```c#
 internal class ActionButtons
@@ -98,23 +98,23 @@ private void dataGridView1_RowsRemoved(object sender, DataGridViewRowsRemovedEve
 
 
 
-#### �������DataGridView��Scroll��SizeChanged�¼����а�ť��λ�ø��º���������
+#### 三、监控DataGridView的Scroll、SizeChanged事件进行按钮的位置更新和显隐控制
 
-###### 	���û������Ĺ����У��м�����������Ҫ�԰�ť��λ�ý������ã�
+###### 	在用户操作的过程中，有几个场景会需要对按钮的位置进行设置：
 
-  - ������ʱ��԰�ťλ�ý��г�ʼ����
-  - ��ֱ���������޵���ʱ����ť��λ����Ҫ���£���֮��Ȼ��
-  - ��������������ʱ����ť��λ����Ҫ���¡�
-  - DataGridView�п��ȷ����ı�ʱ����ť��λ����Ҫ���¡�
-  - DataGridView��С�����仯ʱ����ť��λ����Ҫ���¡�
+  - 新增的时候对按钮位置进行初始化。
+  - 垂直滚动条由无到有时，按钮的位置需要更新；反之亦然。
+  - 滚动条发生滚动时，按钮的位置需要更新。
+  - DataGridView列宽度发生改变时，按钮的位置需要更新。
+  - DataGridView大小发生变化时，按钮的位置需要更新。
 
-###### ͬ�����м�����������Ҫ�԰�ť��������״̬�Ŀ��ƣ�
+###### 同样，有几个场景会需要对按钮进行显隐状态的控制：
 
-- ����ť�����в���DataGridView��ʾ��Χ��ʱҪ�԰�ť�������ء�
-- ����ť�����б�ɾ��ʱҪ�԰�ť�������ء�
-- DataGridView�п��ȷ����ı�ʱ����ť��λ����Ҫ���¡�
+- 当按钮所在行不在DataGridView显示范围内时要对按钮进行隐藏。
+- 当按钮所在行被删除时要对按钮进行隐藏。
+- DataGridView列宽度发生改变时，按钮的位置需要更新。
 
-?		ÿ�ζ�λ�ú������ĸ��¶���Ҫ�������а�ť�����ҽ����´���ŵ��߳���ִ�У��Ա��������ӡ�ɾ����ͬ���������жϲ���Ӱ�죬����������£�
+每次对位置和显隐的更新都需要遍历所有按钮，并且将更新代码放到线程中执行，以避免行增加、删除的同步操作对判断产生影响，具体代码如下：
 
 ```c#
 private void HideAllActionButtons(ActionButtons ab)
@@ -185,11 +185,9 @@ private void dataGridView1_ColumnWidthChanged(object sender, DataGridViewColumnE
 
 ```
 
-###### ע�����п��ȷ����ı�ʱ���������һ��Refresh����������ˢ�½��棻����Ϊ���϶��иı����ʱ�п��ܻ��ٰ�ť���������϶��ĺۼ���ͨ��ˢ�¿��Իָ���ť����ʽ��
+###### 注：在列宽度发生改变时，多调用了一个Refresh方法，用于刷新界面；是因为在拖动列改变宽度时有可能会再按钮表面留下拖动的痕迹，通过刷新可以恢复按钮的样式。
 
-���յ�Ч������ͼ��
+最终的效果如下图：
 ![]( http://res.dayuan.tech/images/datagridview02.png )
 
-?		���Ϲ�������ʵ����Ŀ��ʹ�ã�Ч������������Ҫ�����ѿ�ͨ���·����ӻ�ȡ�������룬�����е����ݸ��Ƶ��Լ�����Ŀ�м��ɡ�
-
-[����Դ��](https://github.com/softwaiter/datagridview)
+以上功能以在实际项目中使用，效果完美，有需要的朋友可通过下方链接获取完整代码，将其中的内容复制到自己的项目中即可。
