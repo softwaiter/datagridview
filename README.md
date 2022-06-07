@@ -190,4 +190,4 @@ private void dataGridView1_ColumnWidthChanged(object sender, DataGridViewColumnE
 最终的效果如下图：
 ![]( http://res.dayuan.tech/images/datagridview02.png )
 
-以上功能以在实际项目中使用，效果完美，有需要的朋友可通过下方链接获取完整代码，将其中的内容复制到自己的项目中即可。
+
